@@ -148,10 +148,10 @@ function ResolutionMenuItem({
       <ListItemText sx={{ width: 120 }}>
         {width}x{height}
       </ListItemText>
-      <Typography variant="body2" color="text.secondary" sx={{ width: 40 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', width: 40 }}>
         {ratio}
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ width: 60 }}>
+      <Typography variant="body2" sx={{ color: 'text.secondary', width: 60 }}>
         {standard}
       </Typography>
     </MenuItem>

@@ -59,7 +59,7 @@ function RenderSettingsEditor() {
 
   return (
     <Stack spacing={1}>
-      <Typography variant="h6" mb={1}>
+      <Typography variant="h6" sx={{ mb: 1 }}>
         <TuneIcon
           sx={{ verticalAlign: 'middle', paddingBottom: '3px', mr: 1 }}
         />
@@ -78,7 +78,9 @@ function RenderSettingsEditor() {
           size="small"
           value={width}
           onChange={handleWidthChange}
-          inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+          slotProps={{
+            htmlInput: { inputMode: 'numeric', pattern: '[0-9]*' },
+          }}
         />
         <TextField
           id="input-height"
@@ -86,7 +88,9 @@ function RenderSettingsEditor() {
           size="small"
           value={height}
           onChange={handleHeightChange}
-          inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+          slotProps={{
+            htmlInput: { inputMode: 'numeric', pattern: '[0-9]*' },
+          }}
         />
         <TextField
           id="input-number-of-workers"
@@ -94,7 +98,9 @@ function RenderSettingsEditor() {
           size="small"
           value={numberOfWorkers}
           onChange={handleNumberOfWorkersChange}
-          inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+          slotProps={{
+            htmlInput: { inputMode: 'numeric', pattern: '[0-9]*' },
+          }}
         />
       </Stack>
       <FormControl fullWidth>

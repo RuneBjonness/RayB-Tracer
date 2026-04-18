@@ -106,9 +106,11 @@ function App() {
             <Typography
               variant="h3"
               noWrap
-              fontStyle={'italic'}
-              color={theme.palette.secondary.contrastText}
-              mb={1}
+              sx={{
+                fontStyle: 'italic',
+                color: theme.palette.secondary.contrastText,
+                mb: 1,
+              }}
             >
               RayB Tracer
             </Typography>
@@ -126,7 +128,7 @@ function App() {
                   : width * height)
               }
             />
-            <Typography variant="caption" textAlign={'center'}>
+            <Typography variant="caption" align="center">
               [{renderProgress}
               {renderMode === RenderMode.progressivePhotonMapping
                 ? ` / ${renderConfig.iterations} iterations`

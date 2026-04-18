@@ -18,9 +18,6 @@ export default defineConfig({
   ],
   assetsInclude: ['obj', 'ppm'],
   base: '/rayb-tracer/',
-  legacy: {
-    inconsistentCjsInterop: true,
-  },
   server: {
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin',
