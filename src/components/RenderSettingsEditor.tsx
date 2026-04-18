@@ -67,9 +67,9 @@ function RenderSettingsEditor() {
       </Typography>
       <Stack direction="row" spacing={1}>
         <ResolutionSelector
-          onSetResolution={(width: number, height: number): void => {
-            setWidth(width);
-            setHeight(height);
+          onSetResolution={(w: number, h: number): void => {
+            setWidth(w);
+            setHeight(h);
           }}
         />
         <TextField

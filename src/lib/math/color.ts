@@ -69,6 +69,8 @@ export function colorFromHex(hex: string): Color {
     const b = parseInt(hex.substring(5, 7), 16);
     return colorFromRgbUint8(r, g, b);
   } catch (e) {
-    throw new Error(`Invalid hex color: ${hex} (${JSON.stringify(e)})`);
+    throw new Error(`Invalid hex color: ${hex} (${JSON.stringify(e)})`, {
+      cause: e,
+    });
   }
 }

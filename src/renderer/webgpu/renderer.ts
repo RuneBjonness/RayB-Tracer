@@ -336,36 +336,35 @@ const renderWebGpu = async (
 
   performance.mark('scene-created');
 
-  init(scene, ctx).then(() => {
-    performance.mark('render-end');
+  await init(scene, ctx);
+  performance.mark('render-end');
 
-    console.log(
-      'Render stats:\n',
-      `building scene: ${performance
-        .measure('scene', 'render-start', 'scene-created')
-        .duration.toFixed(1)} ms\n`,
-      `building compute pipeline: ${performance
-        .measure('pipeline', 'scene-created', 'compute-pipeline-created')
-        .duration.toFixed(1)} ms\n`,
-      `render pass: ${performance
-        .measure(
-          'render-pass',
-          'compute-pipeline-created',
-          'webgpu-render-pass-end'
-        )
-        .duration.toFixed(1)} ms\n`,
-      `draw to screen: ${performance
-        .measure(
-          'draw-to-screen',
-          'webgpu-render-pass-end',
-          'result-drawn-to-screen'
-        )
-        .duration.toFixed(1)} ms\n`,
-      `total time: ${performance
-        .measure('total', 'render-start', 'render-end')
-        .duration.toFixed(1)} ms\n`
-    );
-  });
+  console.log(
+    'Render stats:\n',
+    `building scene: ${performance
+      .measure('scene', 'render-start', 'scene-created')
+      .duration.toFixed(1)} ms\n`,
+    `building compute pipeline: ${performance
+      .measure('pipeline', 'scene-created', 'compute-pipeline-created')
+      .duration.toFixed(1)} ms\n`,
+    `render pass: ${performance
+      .measure(
+        'render-pass',
+        'compute-pipeline-created',
+        'webgpu-render-pass-end'
+      )
+      .duration.toFixed(1)} ms\n`,
+    `draw to screen: ${performance
+      .measure(
+        'draw-to-screen',
+        'webgpu-render-pass-end',
+        'result-drawn-to-screen'
+      )
+      .duration.toFixed(1)} ms\n`,
+    `total time: ${performance
+      .measure('total', 'render-start', 'render-end')
+      .duration.toFixed(1)} ms\n`
+  );
 };
 
 export default renderWebGpu;

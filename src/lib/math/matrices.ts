@@ -61,25 +61,33 @@ export class Matrix4 {
 
   // prettier-ignore
   public multiply(m: Matrix4): Matrix4 {
-    let t0 = this.elements[0], t1 = this.elements[1], t2 = this.elements[2];
+    let t0 = this.elements[0];
+    let t1 = this.elements[1];
+    let t2 = this.elements[2];
     this.elements[0] = t0 * m.elements[0] + t1 * m.elements[4] + t2 * m.elements[8] + this.elements[3] * m.elements[12];
     this.elements[1] = t0 * m.elements[1] + t1 * m.elements[5] + t2 * m.elements[9] + this.elements[3] * m.elements[13];
     this.elements[2] = t0 * m.elements[2] + t1 * m.elements[6] + t2 * m.elements[10] + this.elements[3] * m.elements[14];
     this.elements[3] = t0 * m.elements[3] + t1 * m.elements[7] + t2 * m.elements[11] + this.elements[3] * m.elements[15];
 
-    t0 = this.elements[4], t1 = this.elements[5], t2 = this.elements[6];
+    t0 = this.elements[4];
+    t1 = this.elements[5];
+    t2 = this.elements[6];
     this.elements[4] = t0 * m.elements[0] + t1 * m.elements[4] + t2 * m.elements[8] + this.elements[7] * m.elements[12];
     this.elements[5] = t0 * m.elements[1] + t1 * m.elements[5] + t2 * m.elements[9] + this.elements[7] * m.elements[13];
     this.elements[6] = t0 * m.elements[2] + t1 * m.elements[6] + t2 * m.elements[10] + this.elements[7] * m.elements[14];
     this.elements[7] = t0 * m.elements[3] + t1 * m.elements[7] + t2 * m.elements[11] + this.elements[7] * m.elements[15];
 
-    t0 = this.elements[8], t1 = this.elements[9], t2 = this.elements[10];
+    t0 = this.elements[8];
+    t1 = this.elements[9];
+    t2 = this.elements[10];
     this.elements[8] = t0 * m.elements[0] + t1 * m.elements[4] + t2 * m.elements[8] + this.elements[11] * m.elements[12];
     this.elements[9] = t0 * m.elements[1] + t1 * m.elements[5] + t2 * m.elements[9] + this.elements[11] * m.elements[13];
     this.elements[10] = t0 * m.elements[2] + t1 * m.elements[6] + t2 * m.elements[10] + this.elements[11] * m.elements[14];
     this.elements[11] = t0 * m.elements[3] + t1 * m.elements[7] + t2 * m.elements[11] + this.elements[11] * m.elements[15];
 
-    t0 = this.elements[12], t1 = this.elements[13], t2 = this.elements[14];
+    t0 = this.elements[12];
+    t1 = this.elements[13];
+    t2 = this.elements[14];
     this.elements[12] = t0 * m.elements[0] + t1 * m.elements[4] + t2 * m.elements[8] + this.elements[15] * m.elements[12];
     this.elements[13] = t0 * m.elements[1] + t1 * m.elements[5] + t2 * m.elements[9] + this.elements[15] * m.elements[13];
     this.elements[14] = t0 * m.elements[2] + t1 * m.elements[6] + t2 * m.elements[10] + this.elements[15] * m.elements[14];

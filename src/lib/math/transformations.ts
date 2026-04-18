@@ -21,9 +21,9 @@ export function radians(deg: number): number {
   return (deg / 180) * Math.PI;
 }
 
-export function rotationX(radians: number): Matrix4 {
-  const cosR = Math.cos(radians);
-  const sinR = Math.sin(radians);
+export function rotationX(rad: number): Matrix4 {
+  const cosR = Math.cos(rad);
+  const sinR = Math.sin(rad);
   // prettier-ignore
   return new Matrix4([
     1, 0, 0, 0,
@@ -33,9 +33,9 @@ export function rotationX(radians: number): Matrix4 {
   ]);
 }
 
-export function rotationY(radians: number): Matrix4 {
-  const cosR = Math.cos(radians);
-  const sinR = Math.sin(radians);
+export function rotationY(rad: number): Matrix4 {
+  const cosR = Math.cos(rad);
+  const sinR = Math.sin(rad);
   // prettier-ignore
   return new Matrix4([
     cosR, 0, sinR, 0,
@@ -45,9 +45,9 @@ export function rotationY(radians: number): Matrix4 {
   ]);
 }
 
-export function rotationZ(radians: number): Matrix4 {
-  const cosR = Math.cos(radians);
-  const sinR = Math.sin(radians);
+export function rotationZ(rad: number): Matrix4 {
+  const cosR = Math.cos(rad);
+  const sinR = Math.sin(rad);
   // prettier-ignore
   return new Matrix4([
     cosR, -sinR, 0, 0,

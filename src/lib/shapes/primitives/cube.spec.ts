@@ -53,9 +53,9 @@ describe('Cubes', () => {
     ${point(0.4, 0.4, -1)}  | ${vector(0, 0, -1)}
     ${point(1, 1, 1)}       | ${vector(1, 0, 0)}
     ${point(-1, -1, -1)}    | ${vector(-1, 0, 0)}
-  `('the normal on a surface of a cube', ({ point, normal }) => {
+  `('the normal on a surface of a cube', ({ point: p, normal }) => {
     const c = new Cube();
-    const n = c.normalAt(point);
+    const n = c.normalAt(p);
 
     expect(n.equals(normal)).toBe(true);
   });

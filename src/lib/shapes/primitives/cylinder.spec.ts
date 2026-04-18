@@ -42,9 +42,9 @@ describe('Cylinders', () => {
     ${point(0, 5, -1)} | ${vector(0, 0, -1)}
     ${point(0, -2, 1)} | ${vector(0, 0, 1)}
     ${point(-1, 1, 0)} | ${vector(-1, 0, 0)}
-  `('the normal on a cylinder', ({ point, normal }) => {
+  `('the normal on a cylinder', ({ point: p, normal }) => {
     const c = new Cylinder();
-    const n = c.normalAt(point);
+    const n = c.normalAt(p);
 
     expect(n.equals(normal)).toBe(true);
   });
@@ -98,9 +98,9 @@ describe('Cylinders', () => {
     ${point(0, 2, 0)}   | ${vector(0, 1, 0)}
     ${point(0.5, 2, 0)} | ${vector(0, 1, 0)}
     ${point(0, 2, 0.5)} | ${vector(0, 1, 0)}
-  `("the normal vector on a cylinder's end caps", ({ point, normal }) => {
+  `("the normal vector on a cylinder's end caps", ({ point: p, normal }) => {
     const c = new Cylinder(1, 2, true);
-    const n = c.normalAt(point);
+    const n = c.normalAt(p);
 
     expect(n.equals(normal)).toBe(true);
   });

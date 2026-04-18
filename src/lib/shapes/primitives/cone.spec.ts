@@ -55,9 +55,9 @@ describe('Cones', () => {
     ${point(0, 0, 0)}   | ${vector(0, 0, 0).normalize()}
     ${point(1, 1, 1)}   | ${vector(1, -Math.sqrt(2), 1).normalize()}
     ${point(-1, -1, 0)} | ${vector(-1, 1, 0).normalize()}
-  `('the normal on a cone', ({ point, normal }) => {
+  `('the normal on a cone', ({ point: p, normal }) => {
     const c = new Cone();
-    const n = c.normalAt(point);
+    const n = c.normalAt(p);
 
     expect(n.equals(normal)).toBe(true);
   });

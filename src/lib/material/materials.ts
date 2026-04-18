@@ -142,7 +142,7 @@ function lightingSample(
   point: Vector4,
   eyev: Vector4,
   normalv: Vector4,
-  material: Material,
+  mat: Material,
   effectiveColor: Color,
   specularLight: Color
 ): Color {
@@ -155,7 +155,7 @@ function lightingSample(
 
   const diffuse = effectiveColor
     .clone()
-    .multiplyByScalar(material.diffuse * lightDotNormal);
+    .multiplyByScalar(mat.diffuse * lightDotNormal);
 
   const reflectDotEye = lightv.negate().reflect(normalv).dot(eyev);
   if (reflectDotEye <= 0) {
@@ -164,7 +164,7 @@ function lightingSample(
 
   const specular = specularLight
     .clone()
-    .multiplyByScalar(Math.pow(reflectDotEye, material.shininess));
+    .multiplyByScalar(Math.pow(reflectDotEye, mat.shininess));
 
   return diffuse.add(specular);
 }

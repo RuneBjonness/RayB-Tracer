@@ -484,8 +484,8 @@ export class BufferBackedWorld {
     }
 
     let point = p.clone();
-    for (let i = matrices.length - 1; i >= 0; i--) {
-      point.applyMatrixBuffer(matrices[i]);
+    for (let j = matrices.length - 1; j >= 0; j--) {
+      point.applyMatrixBuffer(matrices[j]);
     }
     return point;
   }

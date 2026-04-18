@@ -106,16 +106,30 @@ describe('lighting features', () => {
     mat.ambient = 1;
     mat.diffuse = 0;
     mat.specular = 0;
-    const shape = new TransformableSphere();
-    shape.materialDefinitions = [mat];
-    shape.material = mat;
-    shape.patternDefinitions = [new StripePattern(c1, c2)];
+    const patternedShape = new TransformableSphere();
+    patternedShape.materialDefinitions = [mat];
+    patternedShape.material = mat;
+    patternedShape.patternDefinitions = [new StripePattern(c1, c2)];
 
     const eyev = vector(0, 0, -1);
     const light = new PointLight(point(0, 0, -10), new Color(1, 1, 1));
 
-    const a = lighting(shape, light, point(0.9, 0, 0), eyev, normalv, 0);
-    const b = lighting(shape, light, point(1.1, 0, 0), eyev, normalv, 0);
+    const a = lighting(
+      patternedShape,
+      light,
+      point(0.9, 0, 0),
+      eyev,
+      normalv,
+      0
+    );
+    const b = lighting(
+      patternedShape,
+      light,
+      point(1.1, 0, 0),
+      eyev,
+      normalv,
+      0
+    );
 
     expect(a.equals(c1)).toBe(true);
     expect(b.equals(c2)).toBe(true);
