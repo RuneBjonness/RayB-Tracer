@@ -36,6 +36,10 @@ export function dodecahedronDefinition(
   cylinderRadius: number
 ): Record<string, ShapeTypeDefinition> {
   const midradius = edgeLength * 1.309016994;
+  const phi = (1 + Math.sqrt(5)) / 2;
+  const faceToEdgeAngle = (Math.atan(1 / phi) * 180) / Math.PI;
+  const faceToEdgeAngleComplement = 90 - faceToEdgeAngle;
+  const vertexSphereRadius = cylinderRadius * 1.0001;
 
   return {
     edgeAndVertex: {
@@ -53,7 +57,7 @@ export function dodecahedronDefinition(
       right: {
         type: { type: 'sphere' },
         transform: [
-          ['scale', cylinderRadius, cylinderRadius, cylinderRadius],
+          ['scale', vertexSphereRadius, vertexSphereRadius, vertexSphereRadius],
           ['translate', 0, edgeLength / 2, 0],
         ],
       },
@@ -66,7 +70,7 @@ export function dodecahedronDefinition(
         transform: [
           ['rotateZ', 90],
           ['translate', 0, -midradius, -0],
-          ['rotateX', 31.75],
+          ['rotateX', faceToEdgeAngle],
         ],
       },
       right: {
@@ -74,7 +78,7 @@ export function dodecahedronDefinition(
         transform: [
           ['rotateX', -90],
           ['translate', 0, -midradius, 0],
-          ['rotateX', 58.75],
+          ['rotateX', faceToEdgeAngleComplement],
           ['rotateY', 36],
         ],
       },
@@ -94,7 +98,7 @@ export function dodecahedronDefinition(
         },
         transform: [
           ['scale', cylinderRadius, edgeLength, cylinderRadius],
-          ['rotateZ', -60],
+          ['rotateZ', -faceToEdgeAngleComplement],
           ['translate', 0, 0, -midradius],
           ['rotateY', 18],
         ],
@@ -115,7 +119,7 @@ export function dodecahedronDefinition(
         },
         transform: [
           ['scale', cylinderRadius, edgeLength, cylinderRadius],
-          ['rotateZ', 60],
+          ['rotateZ', faceToEdgeAngleComplement],
           ['translate', 0, 0, -midradius],
           ['rotateY', -18],
         ],
