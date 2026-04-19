@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import RtCanvas from './Canvas';
 import {
   Box,
   CssBaseline,
@@ -7,17 +6,22 @@ import {
   ThemeProvider,
   useMediaQuery,
 } from '@mui/material';
-import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
 import LandscapeOutlinedIcon from '@mui/icons-material/LandscapeOutlined';
-import RenderSettingsEditor from './RenderSettingsEditor';
-import SceneSelector from './SceneSelector';
-import Panel from './Panel';
-import RenderHud from './RenderHud';
+import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
+
 import useRayTracerStore from '../store';
 import { getRenderConfiguration } from '../renderer/configuration';
 import { ScenePreset } from '../scenes/scene-preset';
+import { usePan } from '../hooks/usePan';
+import { stageBackgroundSx } from '../styling/backgroundPattern';
 import { FROSTED_BORDER } from '../styling/frostedGlass';
 import { theme } from '../styling/theme';
+
+import RtCanvas from './Canvas';
+import Panel from './Panel';
+import RenderHud from './RenderHud';
+import RenderSettingsEditor from './RenderSettingsEditor';
+import SceneSelector from './SceneSelector';
 
 function App() {
   const sceneMode = useRayTracerStore((state) => state.sceneMode);
@@ -49,12 +53,11 @@ function App() {
   };
 
   const isNarrow = useMediaQuery('(max-width: 720px)');
+  const { pan, handlers: panHandlers } = usePan();
 
   useEffect(() => {
     if (isNarrow) {
-      const openCount = Object.values(panelCollapsed).filter(
-        (c) => !c
-      ).length;
+      const openCount = Object.values(panelCollapsed).filter((c) => !c).length;
       if (openCount > 1) {
         collapseAllPanels();
       }
@@ -102,21 +105,23 @@ function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Box
+        {...panHandlers}
         sx={{
           position: 'fixed',
           inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          overflow: 'auto',
+          overflow: 'hidden',
           backgroundColor: theme.palette.background.default,
+          ...stageBackgroundSx,
+          cursor: 'grab',
+          touchAction: 'none',
         }}
       >
         <Box
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: `translate(calc(-50% + ${pan.x}px), calc(-50% + ${pan.y}px))`,
             p: 2,
           }}
         >
@@ -126,29 +131,28 @@ function App() {
             cfg={renderConfig}
           />
         </Box>
-
-        {isNarrow ? (
-          <Box
-            sx={{
-              position: 'fixed',
-              inset: 0,
-              p: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 1.5,
-              zIndex: 1,
-              // Let clicks through the gaps to the canvas, but keep panels
-              // interactive.
-              pointerEvents: 'none',
-              '& > *': { pointerEvents: 'auto' },
-            }}
-          >
-            {panels}
-          </Box>
-        ) : (
-          panels
-        )}
       </Box>
+
+      {isNarrow ? (
+        <Box
+          sx={{
+            position: 'fixed',
+            inset: 0,
+            p: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 1.5,
+            zIndex: 1,
+            // Let pointer events through the gaps to the stage below.
+            pointerEvents: 'none',
+            '& > *': { pointerEvents: 'auto' },
+          }}
+        >
+          {panels}
+        </Box>
+      ) : (
+        panels
+      )}
     </ThemeProvider>
   );
 }

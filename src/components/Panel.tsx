@@ -68,9 +68,7 @@ const PanelHeader = ({
         py: 1,
         justifyContent: 'flex-start',
         textAlign: 'left',
-        borderBottom: expanded
-          ? '1px solid rgba(185, 211, 207, 0.08)'
-          : 'none',
+        borderBottom: expanded ? '1px solid rgba(185, 211, 207, 0.08)' : 'none',
         transition: 'background-color 120ms ease',
         '&:hover': { backgroundColor: 'rgba(185, 211, 207, 0.06)' },
         '&:focus-visible': {
@@ -107,7 +105,10 @@ const PanelHeader = ({
         >
           {title}
         </Typography>
-        <Chevron fontSize="small" sx={{ color: theme.palette.text.secondary }} />
+        <Chevron
+          fontSize="small"
+          sx={{ color: theme.palette.text.secondary }}
+        />
       </Stack>
     </ButtonBase>
   );
@@ -139,7 +140,7 @@ const Panel = ({
         ...(fill && flexFill),
       }
     : {
-        position: 'absolute',
+        position: 'fixed',
         top: 0,
         [side]: 0,
         width: 400,
