@@ -2,8 +2,10 @@ import { RenderConfiguration, RenderMode } from './configuration';
 import { SceneMode } from '../scenes/scene';
 import { ScenePreset } from '../scenes/scene-preset';
 import renderWebGpu from './webgpu/renderer';
+import renderProgressiveGpu from './webgpu/progressive-renderer';
 import renderWebWorkers from './web-workers/renderer';
 import renderWebWorkersSharedMemory from './web-workers-shared-memory/renderer';
+import renderProgressiveCpu from './web-workers-shared-memory/progressive-renderer';
 
 const render = async (
   ctx: CanvasRenderingContext2D,
@@ -25,6 +27,10 @@ const render = async (
     return renderWebGpu(ctx, cfg, sceneMode, scene, onProgress);
   } else if (cfg.renderMode === RenderMode.sharedMemoryPreview) {
     return renderWebWorkersSharedMemory(ctx, cfg, sceneMode, scene, onProgress);
+  } else if (cfg.renderMode === RenderMode.progressiveCpu) {
+    return renderProgressiveCpu(ctx, cfg, sceneMode, scene, onProgress);
+  } else if (cfg.renderMode === RenderMode.progressiveGpu) {
+    return renderProgressiveGpu(ctx, cfg, sceneMode, scene, onProgress);
   }
   return renderWebWorkers(ctx, cfg, sceneMode, scene, onProgress);
 };

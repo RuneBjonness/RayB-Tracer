@@ -17,7 +17,6 @@ export type RenderConfiguration = {
   adaptiveFocalSamplingSensitivity: number;
 
   iterations: number;
-  photonsPerIteration: number;
 };
 
 export enum RenderMode {
@@ -27,9 +26,10 @@ export enum RenderMode {
   indirectLightningPreview = 'Dynamic sampling with indirect lightning (preview)',
   indirectLightning = 'Dynamic sampling with indirect lightning',
   fixedSampling = 'Fixed sampling',
-  progressivePhotonMapping = 'Progressive photon mapping (experimental)',
   webGpuPreview = 'WebGPU preview (experimental)',
   sharedMemoryPreview = 'Shared Memory preview (experimental)',
+  progressiveCpu = 'Progressive CPU (experimental)',
+  progressiveGpu = 'Progressive GPU (experimental)',
 }
 
 function renderConfiguration(
@@ -51,7 +51,6 @@ function renderConfiguration(
     maxFocalSamples: 81,
     adaptiveFocalSamplingSensitivity: 1,
     iterations: 0,
-    photonsPerIteration: 0,
   };
 }
 
@@ -85,9 +84,12 @@ export function getRenderConfiguration(
     cfg.maxIndirectLightSamples = 16;
     cfg.adaptiveLightSamplingSensitivity = -1;
     cfg.adaptiveFocalSamplingSensitivity = -1;
-  } else if (mode === RenderMode.progressivePhotonMapping) {
-    cfg.iterations = numberOfWorkers * 8;
-    cfg.photonsPerIteration = width * height;
+  } else if (
+    mode === RenderMode.progressiveCpu ||
+    mode === RenderMode.progressiveGpu
+  ) {
+    cfg.maxDepth = 4;
+    cfg.iterations = 256;
   }
   return cfg;
 }

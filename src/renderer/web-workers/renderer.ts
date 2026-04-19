@@ -1,4 +1,4 @@
-import { RenderConfiguration, RenderMode } from '../configuration';
+import { RenderConfiguration } from '../configuration';
 import { SceneMode } from '../../scenes/scene';
 import { ScenePreset } from '../../scenes/scene-preset';
 
@@ -15,10 +15,6 @@ function createRenderPartList(
   cfg: RenderConfiguration,
   randomizeOrder: boolean
 ): CanvasPart[] {
-  if (cfg.renderMode === RenderMode.progressivePhotonMapping) {
-    return [];
-  }
-
   const chunkHeight = Math.min(
     16,
     Math.floor(cfg.height / cfg.numberOfWorkers)
@@ -69,7 +65,6 @@ const renderWebWorkers = async (
   const canvasParts = createRenderPartList(cfg, true);
   performance.mark('preparations-complete');
 
-  let remainingPhotonMapperIterations = cfg.iterations;
   let activeWorkers = 0;
 
   for (let i = 0; i < cfg.numberOfWorkers; i++) {
@@ -110,58 +105,12 @@ const renderWebWorkers = async (
         const cp: CanvasPart = e.data.cp;
         ctx!.putImageData(e.data.imageData, cp.x, cp.y);
         onProgress(cp.w * cp.h);
-      } else if (e.data.command === 'photonMapperIteration') {
-        if (remainingPhotonMapperIterations > 0) {
-          remainingPhotonMapperIterations--;
-          worker.postMessage({
-            command: 'photonMapperIteration',
-            photons: cfg.photonsPerIteration,
-          });
-        } else {
-          activeWorkers--;
-          if (activeWorkers === 0) {
-            performance.mark('render-end');
-            performance.measure('render', 'render-start', 'render-end');
-            console.log(
-              'Render stats:\n',
-              `preparations: ${performance
-                .measure(
-                  'preparations',
-                  'render-start',
-                  'preparations-complete'
-                )
-                .duration.toFixed(1)} ms\n`,
-              `building scene: ${performance
-                .measure('scene', 'render-start', 'scene-created')
-                .duration.toFixed(1)} ms\n`,
-              `photo mapper: ${performance
-                .measure('photon-mapper', 'scene-created', 'render-end')
-                .duration.toFixed(1)} ms\n`,
-              `total time: ${performance
-                .measure('total', 'render-start', 'render-end')
-                .duration.toFixed(1)} ms\n`
-            );
-          }
-        }
-
-        onProgress(1);
       } else if (e.data.command === 'initComplete') {
         performance.mark('scene-created');
-        if (cfg.renderMode === RenderMode.progressivePhotonMapping) {
-          if (remainingPhotonMapperIterations > 0) {
-            remainingPhotonMapperIterations--;
-            worker.postMessage({
-              command: 'photonMapperIteration',
-              photons: cfg.photonsPerIteration,
-            });
-            activeWorkers++;
-          }
-        } else {
-          const cp = canvasParts.pop();
-          if (cp) {
-            worker.postMessage({ command: 'rtRenderTile', cp });
-            activeWorkers++;
-          }
+        const cp = canvasParts.pop();
+        if (cp) {
+          worker.postMessage({ command: 'rtRenderTile', cp });
+          activeWorkers++;
         }
       }
     };

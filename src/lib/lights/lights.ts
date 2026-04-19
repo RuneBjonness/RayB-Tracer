@@ -1,5 +1,4 @@
 import { Matrix4 } from '../math/matrices';
-import { Photon } from '../photon-mapper';
 import { Cube } from '../shapes/primitives/cube';
 import { scaling } from '../math/transformations';
 import { World } from '../world/world';
@@ -16,7 +15,6 @@ export interface Light {
 
   intensityAt(p: Vector4, w: World): number;
   samplePoints(): Vector4[];
-  emitPhotons(count: number, powerFactor: number): Photon[];
 
   copyLightToArrayBuffer(buffer: ArrayBufferLike, offset: number): void;
 }
@@ -38,23 +36,6 @@ export class PointLight implements Light {
 
   intensityAt(p: Vector4, w: World): number {
     return w.isShadowed(p, this.samplePoints()[0]) ? 0.0 : 1.0;
-  }
-
-  emitPhotons(count: number, powerFactor: number): Photon[] {
-    const photons = Array.from<Photon>({ length: count });
-    for (let i = 0; i < count; i++) {
-      photons[i] = {
-        position: this.position,
-        direction: vector(
-          Math.random() * 2 - 1,
-          Math.random() * 2 - 1,
-          Math.random() * 2 - 1
-        ),
-        interactedWithSpecular: false,
-        power: this.intensity.clone().multiplyByScalar(powerFactor),
-      };
-    }
-    return photons;
   }
 
   copyLightToArrayBuffer(buffer: ArrayBufferLike, offset: number): void {
@@ -169,24 +150,6 @@ export class AreaLight extends Cube implements Light {
       }
     }
     return avgSampleIntensity;
-  }
-
-  emitPhotons(count: number, powerFactor: number): Photon[] {
-    const photons = Array.from<Photon>({ length: count });
-    for (let i = 0; i < count; i++) {
-      let samplePos = this.uvSampleConfig[i % this.uvSampleConfig.length];
-      photons[i] = {
-        position: this.pointOnLight(samplePos.u, samplePos.v),
-        direction: vector(
-          Math.random() * 2 - 1,
-          -Math.random(),
-          Math.random() * 2 - 1
-        ),
-        interactedWithSpecular: false,
-        power: this.intensity.clone().multiplyByScalar(powerFactor),
-      };
-    }
-    return photons;
   }
 
   copyLightToArrayBuffer(buffer: ArrayBufferLike, offset: number): void {

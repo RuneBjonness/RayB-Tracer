@@ -1,4 +1,4 @@
-import { RenderConfiguration, RenderMode } from '../configuration';
+import { RenderConfiguration } from '../configuration';
 import { Scene, SceneMode } from '../../scenes/scene';
 import { loadScene, ScenePreset } from '../../scenes/scene-preset';
 import { MatrixOrder } from '../../lib/math/matrices';
@@ -16,10 +16,6 @@ function createRenderPartList(
   cfg: RenderConfiguration,
   randomizeOrder: boolean
 ): CanvasPart[] {
-  if (cfg.renderMode === RenderMode.progressivePhotonMapping) {
-    return [];
-  }
-
   const chunkHeight = Math.min(
     16,
     Math.floor(cfg.height / cfg.numberOfWorkers)

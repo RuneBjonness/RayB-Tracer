@@ -25,6 +25,11 @@ interface RayTracerStore {
 
   renderProgress: number;
 
+  isRendering: boolean;
+  currentPass: number;
+  targetPasses: number;
+  cancelRequested: boolean;
+
   panelCollapsed: PanelCollapsed;
 
   setSceneMode: (sceneMode: SceneMode) => void;
@@ -38,6 +43,11 @@ interface RayTracerStore {
 
   resetRenderProgress: () => void;
   incrementRenderProgress: (pixels: number) => void;
+
+  startRender: (targetPasses?: number) => void;
+  cancelRender: () => void;
+  tickPass: () => void;
+  completeRender: () => void;
 
   togglePanel: (id: PanelId, singleOpen?: boolean) => void;
   collapseAllPanels: () => void;
@@ -55,6 +65,10 @@ const useRayTracerStore = create<RayTracerStore>()(
         numberOfWorkers: 8,
         renderMode: RenderMode.preview,
         renderProgress: 0,
+        isRendering: false,
+        currentPass: 0,
+        targetPasses: 256,
+        cancelRequested: false,
         panelCollapsed: defaultPanelCollapsed,
         setSceneMode: (sceneMode) => set({ sceneMode }),
         setScenePreset: (scenePreset) => set({ scenePreset }),
@@ -66,6 +80,18 @@ const useRayTracerStore = create<RayTracerStore>()(
         resetRenderProgress: () => set({ renderProgress: 0 }),
         incrementRenderProgress: (pixels) =>
           set((state) => ({ renderProgress: state.renderProgress + pixels })),
+        startRender: (targetPasses) =>
+          set((state) => ({
+            isRendering: true,
+            currentPass: 0,
+            cancelRequested: false,
+            targetPasses: targetPasses ?? state.targetPasses,
+          })),
+        cancelRender: () => set({ cancelRequested: true }),
+        tickPass: () =>
+          set((state) => ({ currentPass: state.currentPass + 1 })),
+        completeRender: () =>
+          set({ isRendering: false, cancelRequested: false }),
         togglePanel: (id, singleOpen) =>
           set((state) => {
             const willExpand = state.panelCollapsed[id];

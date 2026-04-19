@@ -9,11 +9,15 @@ struct TraceResult {
 }
 
 fn shade_pixel(x: f32, y: f32) -> vec3f {
+  return shade_ray(ray_for_pixel(x, y));
+}
+
+fn shade_ray(primary_ray: Ray) -> vec3f {
   var color = vec3<f32>(0.0, 0.0, 0.0);
   let max_depth = clamp(camera.max_depth + 1, 1, 6); // TODO: change definition of max_depth to include the first ray in TS
   let trace_results_len = u32(pow(2.0, f32(max_depth)));
   var trace_results = array<TraceResult, 128>();
-  trace_results[0] = TraceResult(true, vec3<f32>(0.0, 0.0, 0.0), 1.0, ray_for_pixel(x, y), Ray(vec3f(), vec3f()), 1.0, 0.0);
+  trace_results[0] = TraceResult(true, vec3<f32>(0.0, 0.0, 0.0), 1.0, primary_ray, Ray(vec3f(), vec3f()), 1.0, 0.0);
 
   for(var i = 0u; i < max_depth; i++) {
     var all_terminated = true;
@@ -25,16 +29,16 @@ fn shade_pixel(x: f32, y: f32) -> vec3f {
 
       if(trace_results[j].reflect_blend_factor > 0.0) {
         reflect_result = trace(
-          trace_results[j].reflect_ray, 
-          trace_results[j].color, 
-          trace_results[j].reflect_blend_factor, 
+          trace_results[j].reflect_ray,
+          trace_results[j].color,
+          trace_results[j].reflect_blend_factor,
           trace_results[j].refractive_index);
       }
       if(trace_results[j].refract_blend_factor > 0.0) {
         refract_result = trace(
-          trace_results[j].refract_ray, 
-          trace_results[j].color, 
-          trace_results[j].refract_blend_factor, 
+          trace_results[j].refract_ray,
+          trace_results[j].color,
+          trace_results[j].refract_blend_factor,
           trace_results[j].refractive_index);
       }
       color += reflect_result.color + refract_result.color;
@@ -65,6 +69,16 @@ fn ray_for_pixel(x: f32, y: f32) -> Ray {
   let pixel = (camera.inv_transform * vec4<f32>(world_x, world_y, -1.0, 1.0)).xyz;
   let direction = normalize(pixel.xyz - camera.origin.xyz);
 
+  return Ray(camera.origin, direction);
+}
+
+fn ray_for_pixel_jittered(x: f32, y: f32, jx: f32, jy: f32) -> Ray {
+  let xoffset = (x + jx) * camera.pixel_size;
+  let yoffset = (y + jy) * camera.pixel_size;
+  let world_x = camera.half_width - xoffset;
+  let world_y = camera.half_height - yoffset;
+  let pixel = (camera.inv_transform * vec4<f32>(world_x, world_y, -1.0, 1.0)).xyz;
+  let direction = normalize(pixel.xyz - camera.origin.xyz);
   return Ray(camera.origin, direction);
 }
 

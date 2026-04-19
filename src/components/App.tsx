@@ -75,7 +75,7 @@ function App() {
       icon={<PlayArrowOutlinedIcon fontSize="small" />}
       stacked={isNarrow}
     >
-      <RenderHud renderConfig={renderConfig} onRender={handleRenderClick} />
+      <RenderHud onRender={handleRenderClick} />
       <Divider sx={{ my: 2, borderColor: FROSTED_BORDER }} />
       <RenderSettingsEditor />
     </Panel>

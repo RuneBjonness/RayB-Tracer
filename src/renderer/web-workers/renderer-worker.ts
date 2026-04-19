@@ -23,11 +23,5 @@ onmessage = async function (e) {
     postMessage({ command: 'rtRenderTile', cp, imageData }, [
       imageData.data.buffer,
     ]);
-  } else if (e.data.command === 'photonMapperIteration') {
-    console.log(
-      'Worker photonMapperIteration - number of photons: ',
-      e.data.photons
-    );
-    postMessage({ command: 'photonMapperIteration' });
   }
 };

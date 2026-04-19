@@ -9,6 +9,7 @@ import {
 } from '../material/buffer-backed-material';
 import { Color } from '../math/color';
 import { Vector4 } from '../math/vector4';
+import { nextFloat01, sampleHemisphereCosine } from '../math/rng';
 import { Ray } from '../rays';
 import { BufferBackedBvhNode } from '../shapes/buffer-backed-objects/buffer-backed-bvh-node';
 import { EPSILON } from '../shapes/buffer-backed-objects/buffer-backed-objects';
@@ -188,6 +189,59 @@ export class BufferBackedWorld {
     }
 
     return color.add(reflected).add(refracted);
+  }
+
+  // Monte Carlo shade: full Whitted shading for the primary ray (which
+  // preserves reflections + refractions + direct lighting) plus one
+  // cosine-weighted hemisphere indirect bounce weighted by albedo.
+  progressiveColorAt(
+    r: Ray,
+    maxDepth: number,
+    rng: Uint32Array,
+    includeIndirect: boolean = true
+  ): Color {
+    const color = this.colorAt(r, maxDepth);
+
+    if (!includeIndirect || maxDepth <= 0 || this.lights.length === 0) {
+      return color;
+    }
+
+    const intersections = this.intersects(r);
+    const hit = hitSorted(intersections);
+    if (hit === null) {
+      return color;
+    }
+
+    this.material.listIndex = hit.materialIndex;
+    const diffuse = this.material.diffuse;
+    if (diffuse <= 0) {
+      return color;
+    }
+
+    const point = r.position(hit.time);
+    const eyev = r.direction.clone().negate();
+    const normalv = this.normalAt(point, hit);
+    if (normalv.dot(eyev) < 0) {
+      normalv.negate();
+    }
+    const overPoint = point.clone().add(normalv.clone().scale(EPSILON));
+
+    this.material.listIndex = hit.materialIndex;
+    const albedo = this.material.colorAt(point).multiplyByScalar(diffuse);
+
+    const u1 = nextFloat01(rng);
+    const u2 = nextFloat01(rng);
+    const indirectDir = sampleHemisphereCosine(u1, u2, normalv);
+    const indirect = this.colorAt(
+      new Ray(overPoint, indirectDir),
+      maxDepth - 1
+    );
+    albedo.r *= indirect.r;
+    albedo.g *= indirect.g;
+    albedo.b *= indirect.b;
+    color.add(albedo);
+
+    return color;
   }
 
   intersects(r: Ray): Intersection[] {

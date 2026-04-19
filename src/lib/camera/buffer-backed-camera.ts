@@ -1,6 +1,7 @@
 import { Canvas } from '../canvas';
 import { Vector4, point, pointFromF32Array } from '../math/vector4';
 import { Ray, rayToTarget } from '../rays';
+import { nextFloat01, reseed } from '../math/rng';
 import { BufferBackedWorld } from '../world/buffer-backed-world';
 
 export class BufferBackedCamera {
@@ -48,6 +49,47 @@ export class BufferBackedCamera {
     rays.push(rayToTarget(this.origin, px));
     // }
     return rays;
+  }
+
+  rayForPixelJittered(x: number, y: number, rng: Uint32Array): Ray {
+    const jx = nextFloat01(rng);
+    const jy = nextFloat01(rng);
+    const xOffset = (x + jx) * this.pixelSize;
+    const yOffset = (y + jy) * this.pixelSize;
+    const worldX = this.halfWidth - xOffset;
+    const worldY = this.halfHeight - yOffset;
+    const px = point(worldX, worldY, -1).applyMatrixBuffer(this.invTransform);
+    return rayToTarget(this.origin, px);
+  }
+
+  // Render one Monte Carlo sample per pixel for the given tile and pass,
+  // adding results into the 4-floats-per-pixel accumulator SharedArrayBuffer view.
+  // The accumulator's global sample count is incremented by the driver
+  // after all tiles of a pass finish.
+  renderProgressiveTile(
+    w: BufferBackedWorld,
+    accFloats: Float32Array,
+    accWidth: number,
+    startX: number,
+    startY: number,
+    lengthX: number,
+    lengthY: number,
+    passIndex: number
+  ): void {
+    const rng = new Uint32Array(1);
+    for (let dy = 0; dy < lengthY; dy++) {
+      for (let dx = 0; dx < lengthX; dx++) {
+        const px = startX + dx;
+        const py = startY + dy;
+        reseed(rng, px, py, passIndex, 0);
+        const ray = this.rayForPixelJittered(px, py, rng);
+        const color = w.progressiveColorAt(ray, this.maxDepth, rng);
+        const idx = (py * accWidth + px) * 4;
+        accFloats[idx] += color.r;
+        accFloats[idx + 1] += color.g;
+        accFloats[idx + 2] += color.b;
+      }
+    }
   }
 
   renderPart(
