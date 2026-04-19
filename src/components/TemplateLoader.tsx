@@ -1,4 +1,4 @@
-import { IconButton, Menu, MenuList, MenuItem } from '@mui/material';
+import { Button, Menu, MenuList, MenuItem } from '@mui/material';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import React, { useState } from 'react';
 import { SceneTemplate, loadSceneDefinition } from '../scenes/scene-template';
@@ -24,14 +24,16 @@ export default function TemplateLoader({ onLoaded }: TemplateLoaderProps) {
 
   return (
     <>
-      <IconButton
+      <Button
         onClick={openTemplateMenu}
+        variant="outlined"
         size="small"
         color="primary"
-        title="Open template"
+        startIcon={<FileOpenIcon />}
+        sx={{ alignSelf: 'flex-start' }}
       >
-        <FileOpenIcon />
-      </IconButton>
+        Open template
+      </Button>
       <Menu
         id="template-menu"
         anchorEl={menuAnchorEl}

@@ -1,5 +1,4 @@
 import React from 'react';
-import TuneIcon from '@mui/icons-material/Tune';
 import {
   FormControl,
   InputLabel,
@@ -8,7 +7,6 @@ import {
   SelectChangeEvent,
   Stack,
   TextField,
-  Typography,
 } from '@mui/material';
 import useRayTracerStore from '../store';
 import { RenderMode } from '../renderer/configuration';
@@ -59,12 +57,6 @@ function RenderSettingsEditor() {
 
   return (
     <Stack spacing={1}>
-      <Typography variant="h6" sx={{ mb: 1 }}>
-        <TuneIcon
-          sx={{ verticalAlign: 'middle', paddingBottom: '3px', mr: 1 }}
-        />
-        Render Settings
-      </Typography>
       <Stack direction="row" spacing={1}>
         <ResolutionSelector
           onSetResolution={(w: number, h: number): void => {

@@ -1,21 +1,23 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import RtCanvas from './Canvas';
 import {
   Box,
-  Button,
-  createTheme,
   CssBaseline,
-  Drawer,
-  LinearProgress,
-  Stack,
+  Divider,
   ThemeProvider,
-  Typography,
+  useMediaQuery,
 } from '@mui/material';
+import PlayArrowOutlinedIcon from '@mui/icons-material/PlayArrowOutlined';
+import LandscapeOutlinedIcon from '@mui/icons-material/LandscapeOutlined';
 import RenderSettingsEditor from './RenderSettingsEditor';
-import useRayTracerStore from '../store';
-import { getRenderConfiguration, RenderMode } from '../renderer/configuration';
 import SceneSelector from './SceneSelector';
+import Panel from './Panel';
+import RenderHud from './RenderHud';
+import useRayTracerStore from '../store';
+import { getRenderConfiguration } from '../renderer/configuration';
 import { ScenePreset } from '../scenes/scene-preset';
+import { FROSTED_BORDER } from '../styling/frostedGlass';
+import { theme } from '../styling/theme';
 
 function App() {
   const sceneMode = useRayTracerStore((state) => state.sceneMode);
@@ -26,7 +28,11 @@ function App() {
   const height = useRayTracerStore((state) => state.height);
   const numberOfWorkers = useRayTracerStore((state) => state.numberOfWorkers);
   const renderMode = useRayTracerStore((state) => state.renderMode);
-  const renderProgress = useRayTracerStore((state) => state.renderProgress);
+
+  const panelCollapsed = useRayTracerStore((state) => state.panelCollapsed);
+  const collapseAllPanels = useRayTracerStore(
+    (state) => state.collapseAllPanels
+  );
 
   const [renderConfig, setRenderConfig] = useState(
     getRenderConfiguration(width, height, numberOfWorkers, renderMode)
@@ -42,111 +48,106 @@ function App() {
     setRenderScene(sceneMode === 'scenePreset' ? scenePreset : sceneDefinition);
   };
 
-  const theme = createTheme({
-    palette: {
-      mode: 'dark',
-      primary: {
-        main: '#b9d3cf',
-      },
-      secondary: {
-        main: '#435061',
-      },
-      background: {
-        default: '#02211f',
-        paper: '#0d2b29',
-      },
-      text: {
-        primary: '#b9d3cf',
-        secondary: '#506763',
-      },
-      action: {
-        selected: '#b9d3cf',
-      },
-    },
-    components: {
-      MuiCssBaseline: {
-        styleOverrides: {
-          body: {
-            scrollbarColor: '#1e4745 #02211f',
-            '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
-              backgroundColor: '#02211f',
-              width: 6,
-              height: 6,
-            },
-            '&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
-              borderRadius: 3,
-              backgroundColor: '#1e4745',
-              minHeight: 24,
-            },
-          },
-        },
-      },
-    },
-  });
+  const isNarrow = useMediaQuery('(max-width: 720px)');
+
+  useEffect(() => {
+    if (isNarrow) {
+      const openCount = Object.values(panelCollapsed).filter(
+        (c) => !c
+      ).length;
+      if (openCount > 1) {
+        collapseAllPanels();
+      }
+    }
+    // Only run once on mount — we don't want to auto-collapse every time
+    // the user resizes their window.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const renderPanel = (
+    <Panel
+      id="render"
+      side="left"
+      title="RayB Tracer"
+      icon={<PlayArrowOutlinedIcon fontSize="small" />}
+      stacked={isNarrow}
+    >
+      <RenderHud renderConfig={renderConfig} onRender={handleRenderClick} />
+      <Divider sx={{ my: 2, borderColor: FROSTED_BORDER }} />
+      <RenderSettingsEditor />
+    </Panel>
+  );
+
+  const scenePanel = (
+    <Panel
+      id="scene"
+      side="right"
+      title="Scene"
+      icon={<LandscapeOutlinedIcon fontSize="small" />}
+      stacked={isNarrow}
+      fullHeight
+    >
+      <SceneSelector />
+    </Panel>
+  );
+
+  const panels = (
+    <>
+      {renderPanel}
+      {scenePanel}
+    </>
+  );
 
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ display: 'flex' }}>
-        <Drawer
+      <Box
+        sx={{
+          position: 'fixed',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'auto',
+          backgroundColor: theme.palette.background.default,
+        }}
+      >
+        <Box
           sx={{
-            width: 480,
-            flexShrink: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             p: 2,
-            '& .MuiDrawer-paper': {
-              width: 480,
-              boxSizing: 'border-box',
-              p: 2,
-            },
           }}
-          variant="permanent"
-          anchor="left"
         >
-          <Stack spacing={2}>
-            <Typography
-              variant="h3"
-              noWrap
-              sx={{
-                fontStyle: 'italic',
-                color: theme.palette.secondary.contrastText,
-                mb: 1,
-              }}
-            >
-              RayB Tracer
-            </Typography>
-
-            <Button variant="outlined" onClick={handleRenderClick}>
-              Render
-            </Button>
-            <LinearProgress
-              variant="determinate"
-              color="success"
-              value={
-                (renderProgress * 100) /
-                (renderMode === RenderMode.progressivePhotonMapping
-                  ? renderConfig.iterations
-                  : width * height)
-              }
-            />
-            <Typography variant="caption" align="center">
-              [{renderProgress}
-              {renderMode === RenderMode.progressivePhotonMapping
-                ? ` / ${renderConfig.iterations} iterations`
-                : ` / ${width * height} pixels`}
-              ]
-            </Typography>
-
-            <RenderSettingsEditor />
-            <SceneSelector />
-          </Stack>
-        </Drawer>
-        <Box sx={{ flexGrow: 1, p: 2 }}>
           <RtCanvas
             sceneMode={sceneMode}
             scene={renderScene}
             cfg={renderConfig}
           />
         </Box>
+
+        {isNarrow ? (
+          <Box
+            sx={{
+              position: 'fixed',
+              inset: 0,
+              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 1.5,
+              zIndex: 1,
+              // Let clicks through the gaps to the canvas, but keep panels
+              // interactive.
+              pointerEvents: 'none',
+              '& > *': { pointerEvents: 'auto' },
+            }}
+          >
+            {panels}
+          </Box>
+        ) : (
+          panels
+        )}
       </Box>
     </ThemeProvider>
   );

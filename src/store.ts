@@ -4,6 +4,15 @@ import { RenderMode } from './renderer/configuration';
 import { ScenePreset } from './scenes/scene-preset';
 import { SceneMode } from './scenes/scene';
 
+export type PanelId = 'render' | 'scene';
+
+export type PanelCollapsed = Record<PanelId, boolean>;
+
+const defaultPanelCollapsed: PanelCollapsed = {
+  render: false,
+  scene: false,
+};
+
 interface RayTracerStore {
   sceneMode: SceneMode;
   scenePreset: ScenePreset;
@@ -16,6 +25,8 @@ interface RayTracerStore {
 
   renderProgress: number;
 
+  panelCollapsed: PanelCollapsed;
+
   setSceneMode: (sceneMode: SceneMode) => void;
   setScenePreset: (scenePreset: ScenePreset) => void;
   setSceneDefinition: (sceneDefinition: string) => void;
@@ -27,6 +38,9 @@ interface RayTracerStore {
 
   resetRenderProgress: () => void;
   incrementRenderProgress: (pixels: number) => void;
+
+  togglePanel: (id: PanelId, singleOpen?: boolean) => void;
+  collapseAllPanels: () => void;
 }
 
 const useRayTracerStore = create<RayTracerStore>()(
@@ -41,22 +55,35 @@ const useRayTracerStore = create<RayTracerStore>()(
         numberOfWorkers: 8,
         renderMode: RenderMode.preview,
         renderProgress: 0,
-        setSceneMode(sceneMode) {
-          set({ sceneMode: sceneMode });
-        },
-        setScenePreset: (scenePreset: ScenePreset) =>
-          set({ scenePreset: scenePreset }),
-        setSceneDefinition: (sceneDefinition: string) =>
-          set({ sceneDefinition: sceneDefinition }),
-        setWidth: (width: number) => set({ width: width }),
-        setHeight: (height: number) => set({ height: height }),
-        setNumberOfWorkers: (numberOfWorkers: number) =>
-          set({ numberOfWorkers: numberOfWorkers }),
-        setRenderMode: (renderMode: RenderMode) =>
-          set({ renderMode: renderMode }),
+        panelCollapsed: defaultPanelCollapsed,
+        setSceneMode: (sceneMode) => set({ sceneMode }),
+        setScenePreset: (scenePreset) => set({ scenePreset }),
+        setSceneDefinition: (sceneDefinition) => set({ sceneDefinition }),
+        setWidth: (width) => set({ width }),
+        setHeight: (height) => set({ height }),
+        setNumberOfWorkers: (numberOfWorkers) => set({ numberOfWorkers }),
+        setRenderMode: (renderMode) => set({ renderMode }),
         resetRenderProgress: () => set({ renderProgress: 0 }),
-        incrementRenderProgress: (pixels: number) =>
+        incrementRenderProgress: (pixels) =>
           set((state) => ({ renderProgress: state.renderProgress + pixels })),
+        togglePanel: (id, singleOpen) =>
+          set((state) => {
+            const willExpand = state.panelCollapsed[id];
+            if (willExpand && singleOpen) {
+              // Expand this one, collapse everything else.
+              return {
+                panelCollapsed: { render: true, scene: true, [id]: false },
+              };
+            }
+            return {
+              panelCollapsed: {
+                ...state.panelCollapsed,
+                [id]: !state.panelCollapsed[id],
+              },
+            };
+          }),
+        collapseAllPanels: () =>
+          set({ panelCollapsed: { render: true, scene: true } }),
       }),
       {
         name: 'rayb-tracer-storage',
